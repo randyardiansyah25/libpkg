@@ -16,7 +16,7 @@ func JsonToMap(msg string) (map[string]interface{}, error) {
 	}
 }
 
-func SimpleStructToMap(in interface{}) (map[string]interface{}, error) {
+func SimpleStructToMapCustomTag(in interface{}, tag string) (map[string]interface{}, error) {
 	out := make(map[string]interface{})
 
 	v := reflect.ValueOf(in)
@@ -33,9 +33,13 @@ func SimpleStructToMap(in interface{}) (map[string]interface{}, error) {
 	for i := 0; i < v.NumField(); i++ {
 		// gets us a StructField
 		fi := typ.Field(i)
-		if tagv := fi.Tag.Get("map"); tagv != "" {
+		if tagv := fi.Tag.Get(tag); tagv != "" {
 			out[tagv] = v.Field(i).Interface()
 		}
 	}
 	return out, nil
+}
+
+func SimpleStructToMap(in interface{}) (map[string]interface{}, error) {
+	return SimpleStructToMapCustomTag(in, "map")
 }
