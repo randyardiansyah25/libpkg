@@ -66,11 +66,16 @@ func ScanMapToStruct(in interface{}, m map[string]string, tag string) error {
 			v.Field(i).SetString(m[f.Tag.Get(tag)])
 		} else if f.Type.Kind() == reflect.Float64 || f.Type.Kind() == reflect.Float32 {
 			mval := m[f.Tag.Get(tag)]
-			val, _ := strconv.ParseFloat(mval, 64)
-			v.Field(i).SetFloat(val)
+			if len(mval) > 0 {
+				val, _ := strconv.ParseFloat(mval, 64)
+				v.Field(i).SetFloat(val)
+			}
 		} else if f.Type.Kind() == reflect.Int || f.Type.Kind() == reflect.Int64 || f.Type.Kind() == reflect.Int32 {
-			val, _ := strconv.ParseInt(m[f.Tag.Get(tag)], 10, 64)
-			v.Field(i).SetInt(val)
+			mval := m[f.Tag.Get(tag)]
+			if len(mval) > 0 {
+				val, _ := strconv.ParseInt(m[f.Tag.Get(tag)], 10, 64)
+				v.Field(i).SetInt(val)
+			}
 		}
 	}
 	in = v.Interface()
