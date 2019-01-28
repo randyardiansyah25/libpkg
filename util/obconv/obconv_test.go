@@ -28,15 +28,37 @@ func TestJsonToMap(t *testing.T) {
 
 func TestSimpleStructToMap(t *testing.T) {
 	var m struct {
-		Field1 string  `map:"field_1"`
-		Field2 string  `map:"field_2"`
-		Field3 *string `map:"field_3"`
+		NamaFieldString        string  `map:"field_1"`
+		NamaFieldFloat         float64 `map:"field_2"`
+		NamaFieldPointerstring *string `map:"field_3"`
 	}
 
-	m.Field1 = "nilai 1"
-	m.Field2 = "nilai 2"
+	m.NamaFieldString = "nilai 1"
+	m.NamaFieldFloat = 10.2
 	var a string = "test"
-	m.Field3 = &a
+	m.NamaFieldPointerstring = &a
 	nm, _ := SimpleStructToMap(m)
 	fmt.Println("STRUCT TO MAP : ", nm)
+}
+
+func TestScanMapToStruct(t *testing.T) {
+	m := map[string]string{
+		"field_1": "field 1",
+		"field_2": "1000",
+		"field_3": "5",
+	}
+	var st = struct {
+		NamaFieldString string  `map:"field_1"`
+		NamaFieldFloat  float64 `map:"field_2"`
+		NamaFieldInt    int     `map:"field_3"`
+	}{}
+
+	err := ScanMapToStruct(&st, m, "map")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	fmt.Println("NamaFieldString : ", st.NamaFieldString)
+	fmt.Println("NamaFieldFloet : ", st.NamaFieldFloat)
+	fmt.Println("NamaFieldInt : ", st.NamaFieldInt)
 }
