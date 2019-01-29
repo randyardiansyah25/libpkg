@@ -5,14 +5,15 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"time"
 )
 
-func NewSimplePostClient(method string, destUrl string, timeout int64) (*SimplePostClient){
+func NewSimplePostClient(method string, destUrl string, timeout int64) *SimplePostClient {
 	return &SimplePostClient{
-		destUrl:destUrl,
-		method:method,
-		params:url.Values{},
-		header: map[string]string{},
+		destUrl: destUrl,
+		method:  method,
+		params:  url.Values{},
+		header:  map[string]string{},
 	}
 }
 
@@ -23,43 +24,43 @@ type SimplePostClientAuthBasic struct {
 
 type SimplePostClient struct {
 	destUrl string
-	method string
-	request *http.Request
-	client *http.Client
-	params url.Values
-	timeout int64
-	header map[string]string
+	method  string
+	//request *http.Request
+	//client *http.Client
+	params    url.Values
+	timeout   int64
+	header    map[string]string
 	authBasic SimplePostClientAuthBasic
 }
 
-func (s *SimplePostClient) SetHeader(key string, value string){
+func (s *SimplePostClient) SetHeader(key string, value string) {
 	s.header[key] = value
 }
 
-func (s *SimplePostClient) SetAuthBasic(username string, password string){
+func (s *SimplePostClient) SetAuthBasic(username string, password string) {
 	s.authBasic = SimplePostClientAuthBasic{
 		username: username,
 		password: password,
 	}
 }
 
-func (s *SimplePostClient) SetAuthorization(value string){
+func (s *SimplePostClient) SetAuthorization(value string) {
 	s.SetHeader("Authorization", value)
 }
 
-func (s *SimplePostClient) AddParam(key string, value string){
+func (s *SimplePostClient) AddParam(key string, value string) {
 	if len(s.params) == 0 {
 		s.params.Set(key, value)
-	}else{
+	} else {
 		s.params.Add(key, value)
 	}
 }
 
-func (s *SimplePostClient) DoRequest()(*http.Response, error){
+func (s *SimplePostClient) DoRequest() (*http.Response, error) {
 	return s.do(bytes.NewBufferString(s.params.Encode()))
 }
 
-func (s *SimplePostClient) DoRawRequest(body string)(*http.Response, error){
+func (s *SimplePostClient) DoRawRequest(body string) (*http.Response, error) {
 	return s.do(bytes.NewBuffer([]byte(body)))
 }
 
@@ -76,8 +77,15 @@ func (s *SimplePostClient) do(body io.Reader) (*http.Response, error) {
 	for key, value := range s.header {
 		req.Header.Add(key, value)
 	}
+	to := time.Duration(s.timeout) * time.Second
+	tr := &http.Transport{
+		IdleConnTimeout:    to,
+		DisableCompression: true,
+	}
 
-	resp, err := s.client.Do(req)
+	client := &http.Client{Transport: tr, Timeout: to}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
