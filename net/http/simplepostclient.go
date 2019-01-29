@@ -23,10 +23,8 @@ type SimplePostClientAuthBasic struct {
 }
 
 type SimplePostClient struct {
-	destUrl string
-	method  string
-	//request *http.Request
-	//client *http.Client
+	destUrl   string
+	method    string
 	params    url.Values
 	timeout   int64
 	header    map[string]string
