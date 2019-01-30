@@ -48,7 +48,7 @@ func SimpleStructToMapCustomTag(in interface{}, tag string) (map[string]interfac
 	return out, nil
 }
 
-func ScanMapToStruct(in interface{}, m map[string]string, tag string) error {
+func MapStringToStruct(in interface{}, m map[string]string, tag string) error {
 	v := reflect.ValueOf(in)
 
 	if v.Kind() == reflect.Ptr {

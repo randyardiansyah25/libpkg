@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 	"io/ioutil"
+	"libpkg/net/http/util/urlvalues"
 	"net"
 	"net/http"
 	"net/url"
@@ -44,7 +45,7 @@ func (gc *GetClient) Get(param map[string]string) (response *GetClientResponse) 
 		Timeout: to,
 	}
 
-	newUrl := AddParams(gc.Url, ToUrlValues(param))
+	newUrl := urlvalues.AddParams(gc.Url, urlvalues.ToUrlValues(param))
 
 	resp, err := httpClient.Get(newUrl)
 	if err != nil {
