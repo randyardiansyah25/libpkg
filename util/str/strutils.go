@@ -38,3 +38,16 @@ func HexStringToByte(src string) ([]byte, error) {
 	}
 	return dst[:n], nil
 }
+
+func PhoneNumberEscape(phoneNumber string) string {
+	if phoneNumber == "" {
+		return phoneNumber
+	} else if strings.HasPrefix(phoneNumber, "0") {
+		np := []string{"62", phoneNumber[1:len(phoneNumber)]}
+		return strings.Join(np, "")
+	} else if strings.HasPrefix(phoneNumber, "+") {
+		return phoneNumber[1:len(phoneNumber)]
+	} else {
+		return phoneNumber
+	}
+}
