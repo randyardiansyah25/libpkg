@@ -393,7 +393,7 @@
   Label: Transfer number
   LenType: fixed
   MaxLen: 10
-79:00
+79:
   ContentType: "n"
   Label: Transfer, reversal number
   LenType: fixed

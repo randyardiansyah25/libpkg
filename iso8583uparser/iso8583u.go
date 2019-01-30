@@ -22,6 +22,8 @@ func NewISO8583U(params ...string) (ISO8583U, error) {
 	var iso ISO8583U
 	if len(params) > 0 {
 		iso.SpecFile = params[0]
+	} else {
+		iso.SpecFile = DefaultSpecFile
 	}
 	err := iso.prepare()
 	return iso, err
@@ -49,8 +51,8 @@ func (p *ISO8583U) prepare() error {
 	if err != nil {
 		return err
 	}
-	_ = yaml.Unmarshal(ymlContent, &p.fields)
-	return nil
+	err = yaml.Unmarshal(ymlContent, &p.fields)
+	return err
 }
 
 func (p *ISO8583U) getSpecFile() string {
