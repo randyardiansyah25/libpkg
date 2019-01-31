@@ -33,6 +33,9 @@ func ToMapString(values url.Values) map[string]string {
 		if len(val) > 0 {
 			v = val[0]
 		}
+		if v == "<nil>" {
+			v = ""
+		}
 		mv[key] = v
 	}
 	return mv
@@ -57,7 +60,7 @@ func ToUrlValues(v interface{}) url.Values {
 	}
 }
 
-func Marshal(in interface{}, m map[string]string, tag string) error {
+func Marshal(m map[string]string, in interface{}, tag string) error {
 	v := reflect.ValueOf(in)
 
 	if v.Kind() == reflect.Ptr {

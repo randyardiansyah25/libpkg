@@ -77,7 +77,7 @@ func (s *SimpleClient) AddParam(key string, value string) {
 	}
 }
 
-func (s *SimpleClient) GetParams() *url.Values {
+func (s *SimpleClient) GetParams() url.Values {
 	return s.params
 }
 
