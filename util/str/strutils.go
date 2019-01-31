@@ -40,6 +40,7 @@ func HexStringToByte(src string) ([]byte, error) {
 }
 
 func PhoneNumberEscape(phoneNumber string) string {
+	phoneNumber = strings.TrimSpace(phoneNumber)
 	if phoneNumber == "" {
 		return phoneNumber
 	} else if strings.HasPrefix(phoneNumber, "0") {

@@ -75,7 +75,7 @@ func (p *ISO8583U) GoUnMarshal(message string) error {
 }
 
 func (p *ISO8583U) GetField(fieldNo int64) string {
-	return p.isoElement[fieldNo]
+	return strings.TrimSpace(p.isoElement[fieldNo])
 }
 
 func (p *ISO8583U) GetBitmap() string {
