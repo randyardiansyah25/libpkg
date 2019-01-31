@@ -1,7 +1,7 @@
 package urlvalues
 
 import (
-	"echannelgateway/model/errs"
+	"errors"
 	"net/url"
 	"reflect"
 	"strconv"
@@ -65,7 +65,7 @@ func Marshal(in interface{}, m map[string]string, tag string) error {
 	}
 
 	if v.Kind() != reflect.Struct {
-		return errs.ErrInvalidStruct
+		return errors.New("Invalid struct")
 	}
 
 	t := v.Type()
