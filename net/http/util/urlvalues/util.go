@@ -36,7 +36,7 @@ func ToMapString(values url.Values) map[string]string {
 		if v == "<nil>" {
 			v = ""
 		}
-		mv[key] = v
+		mv[key] = strings.TrimSpace(v)
 	}
 	return mv
 }
