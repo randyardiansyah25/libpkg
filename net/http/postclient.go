@@ -68,20 +68,6 @@ func (pc *PostClient) doPost(body *bytes.Buffer) (response *PostClientResponse) 
 
 	resp, err := httpClient.Post(pc.Url, pc.ContentType, body)
 	if err != nil {
-
-		//if netErr, ok := err.(net.Error); ok {
-		//	// You know it's a net.Error instance
-		//	e := netErr.(*url.Error)
-		//	e1 := e.Err.(*net.OpError)
-		//	e2 := e1.Err.(*os.SyscallError)
-		//	e3 := e2.Err.(syscall.Errno)
-		//	fmt.Println(e3)
-		//
-		//	//if err.Error() == "connection lost" {
-		//	//	return nil
-		//	//}
-		//}
-
 		switch errType := err.(type) {
 		case *url.Error:
 			if _, ok := errType.Err.(net.Error); ok && errType.Timeout() {

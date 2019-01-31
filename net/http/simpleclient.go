@@ -2,9 +2,15 @@ package http
 
 import (
 	"bytes"
+	"fmt"
 	"io"
+	"io/ioutil"
+	winnet "libpkg/net"
+	"net"
 	"net/http"
 	"net/url"
+	"os"
+	"syscall"
 	"time"
 )
 
@@ -20,6 +26,23 @@ func NewSimpleClient(method string, destUrl string, timeout int64) *SimpleClient
 type SimplePostClientAuthBasic struct {
 	username string
 	password string
+}
+
+func newResponse(errCode int, errMessage string) *SimpleClientResponse {
+	return &SimpleClientResponse{errMessage, errCode}
+}
+
+type SimpleClientResponse struct {
+	message string
+	code    int
+}
+
+func (e *SimpleClientResponse) Message() string {
+	return e.message
+}
+
+func (e *SimpleClientResponse) StatusCode() int {
+	return e.code
 }
 
 type SimpleClient struct {
@@ -54,18 +77,18 @@ func (s *SimpleClient) AddParam(key string, value string) {
 	}
 }
 
-func (s *SimpleClient) DoRequest() (*http.Response, error) {
+func (s *SimpleClient) DoRequest() *SimpleClientResponse {
 	return s.do(bytes.NewBufferString(s.params.Encode()))
 }
 
-func (s *SimpleClient) DoRawRequest(body string) (*http.Response, error) {
+func (s *SimpleClient) DoRawRequest(body string) *SimpleClientResponse {
 	return s.do(bytes.NewBuffer([]byte(body)))
 }
 
-func (s *SimpleClient) do(body io.Reader) (*http.Response, error) {
+func (s *SimpleClient) do(body io.Reader) *SimpleClientResponse {
 	req, err := http.NewRequest(s.method, s.destUrl, body)
 	if err != nil {
-		return nil, err
+		return newResponse(http.StatusBadGateway, err.Error())
 	}
 
 	if s.authBasic.username != "" {
@@ -85,8 +108,62 @@ func (s *SimpleClient) do(body io.Reader) (*http.Response, error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		switch errType := err.(type) {
+		case *url.Error:
+			if _, ok := errType.Err.(net.Error); ok && errType.Timeout() {
+				return newResponse(http.StatusRequestTimeout, fmt.Sprint("Request timeout for ", to, " second..."))
+			} else if opErr, ok := errType.Err.(*net.OpError); ok {
+				if sysErr, ok := opErr.Err.(*os.SyscallError); ok {
+					if errno, ok := sysErr.Err.(syscall.Errno); ok {
+						if errno == syscall.ECONNABORTED || errno == winnet.WSAECONNABORTED {
+							return newResponse(http.StatusNotFound, "Connection abort")
+						} else if errno == syscall.ECONNRESET || errno == winnet.WSAECONNRESET {
+							return newResponse(http.StatusBadGateway, "Connection reset by peer")
+						} else if errno == syscall.ECONNREFUSED || errno == winnet.WSAECONNREFUSED {
+							return newResponse(http.StatusNotFound, "Connection refused")
+						} else if errno == syscall.ENETUNREACH || errno == winnet.WSAEHOSTUNREACH {
+							return newResponse(http.StatusBadGateway, "Connection unreachable")
+						} else if errno == winnet.WSAEHOSTDOWN {
+							return newResponse(http.StatusBadGateway, "Host is down")
+						} else if errno == winnet.WSAESHUTDOWN {
+							return newResponse(http.StatusBadGateway, "Cannot send after socket shutdown.")
+						} else if errno == winnet.WSAETIMEDOUT {
+							return newResponse(http.StatusBadGateway, "Connection timed out.")
+						} else {
+							return newResponse(http.StatusBadGateway, err.Error())
+						}
+					} else {
+						return newResponse(http.StatusBadGateway, "Closed : "+err.Error())
+					}
+				} else {
+					return newResponse(http.StatusBadGateway, err.Error())
+				}
+			} else {
+				errs := fmt.Sprint(err.(*url.Error).Err)
+				if errs == "EOF" {
+					return newResponse(http.StatusBadRequest, "Connection reset with : "+errs)
+				} else {
+					return newResponse(http.StatusBadRequest, err.Error())
+				}
+			}
+
+		case net.Error:
+			if errType.Timeout() {
+				return newResponse(http.StatusRequestTimeout, fmt.Sprint("Request timeout for ", to, " second..."))
+			}
+		default:
+
+		}
+		//}
+		return newResponse(http.StatusBadGateway, "else : "+err.Error())
+	}
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+	bodyByte, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return newResponse(http.StatusLengthRequired, string(bodyByte))
 	}
 
-	return resp, err
+	return newResponse(http.StatusOK, string(bodyByte))
 }
