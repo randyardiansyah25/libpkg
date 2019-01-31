@@ -20,6 +20,7 @@ func NewSimpleClient(method string, destUrl string, timeout int64) *SimpleClient
 		method:  method,
 		params:  url.Values{},
 		header:  map[string]string{},
+		timeout: timeout,
 	}
 }
 
