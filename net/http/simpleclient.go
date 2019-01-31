@@ -77,6 +77,10 @@ func (s *SimpleClient) AddParam(key string, value string) {
 	}
 }
 
+func (s *SimpleClient) GetParams() *url.Values {
+	return s.params
+}
+
 func (s *SimpleClient) DoRequest() *SimpleClientResponse {
 	return s.do(bytes.NewBufferString(s.params.Encode()))
 }
