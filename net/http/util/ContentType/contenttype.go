@@ -1,4 +1,4 @@
-package contenttype
+package ContentType
 
 const (
 	ApplicationXwwwFormUrlencode = "application/x-www-form-urlencoded"
