@@ -8,8 +8,8 @@ import (
 	"time"
 )
 
-func NewSimplePostClient(method string, destUrl string, timeout int64) *SimplePostClient {
-	return &SimplePostClient{
+func NewSimpleClient(method string, destUrl string, timeout int64) *SimpleClient {
+	return &SimpleClient{
 		destUrl: destUrl,
 		method:  method,
 		params:  url.Values{},
@@ -22,7 +22,7 @@ type SimplePostClientAuthBasic struct {
 	password string
 }
 
-type SimplePostClient struct {
+type SimpleClient struct {
 	destUrl   string
 	method    string
 	params    url.Values
@@ -31,22 +31,22 @@ type SimplePostClient struct {
 	authBasic SimplePostClientAuthBasic
 }
 
-func (s *SimplePostClient) SetHeader(key string, value string) {
+func (s *SimpleClient) SetHeader(key string, value string) {
 	s.header[key] = value
 }
 
-func (s *SimplePostClient) SetAuthBasic(username string, password string) {
+func (s *SimpleClient) SetAuthBasic(username string, password string) {
 	s.authBasic = SimplePostClientAuthBasic{
 		username: username,
 		password: password,
 	}
 }
 
-func (s *SimplePostClient) SetAuthorization(value string) {
+func (s *SimpleClient) SetAuthorization(value string) {
 	s.SetHeader("Authorization", value)
 }
 
-func (s *SimplePostClient) AddParam(key string, value string) {
+func (s *SimpleClient) AddParam(key string, value string) {
 	if len(s.params) == 0 {
 		s.params.Set(key, value)
 	} else {
@@ -54,15 +54,15 @@ func (s *SimplePostClient) AddParam(key string, value string) {
 	}
 }
 
-func (s *SimplePostClient) DoRequest() (*http.Response, error) {
+func (s *SimpleClient) DoRequest() (*http.Response, error) {
 	return s.do(bytes.NewBufferString(s.params.Encode()))
 }
 
-func (s *SimplePostClient) DoRawRequest(body string) (*http.Response, error) {
+func (s *SimpleClient) DoRawRequest(body string) (*http.Response, error) {
 	return s.do(bytes.NewBuffer([]byte(body)))
 }
 
-func (s *SimplePostClient) do(body io.Reader) (*http.Response, error) {
+func (s *SimpleClient) do(body io.Reader) (*http.Response, error) {
 	req, err := http.NewRequest(s.method, s.destUrl, body)
 	if err != nil {
 		return nil, err
