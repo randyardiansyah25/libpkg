@@ -59,6 +59,10 @@ func (s *SimpleClient) SetHeader(key string, value string) {
 	s.header[key] = value
 }
 
+func (s *SimpleClient) SetContentType(value string) {
+	s.header["Content-Type"] = value
+}
+
 func (s *SimpleClient) SetAuthBasic(username string, password string) {
 	s.authBasic = SimplePostClientAuthBasic{
 		username: username,
@@ -75,6 +79,12 @@ func (s *SimpleClient) AddParam(key string, value string) {
 		s.params.Set(key, value)
 	} else {
 		s.params.Add(key, value)
+	}
+}
+
+func (s *SimpleClient) AddParams(params map[string]string) {
+	for key, val := range params {
+		s.params.Add(key, val)
 	}
 }
 
