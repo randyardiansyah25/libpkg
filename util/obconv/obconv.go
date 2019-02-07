@@ -58,7 +58,7 @@ func MapStringToStruct(in interface{}, m map[string]string, tag string) error {
 	}
 
 	if v.Kind() != reflect.Struct {
-		return errs.ErrInvalidStruct
+		return ErrInvalidStruct
 	}
 
 	t := v.Type()
