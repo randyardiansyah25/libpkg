@@ -92,6 +92,11 @@ func handler(c net.Conn, handlerChain map[string]TcpHandler, fieldNumber int64) 
 	funct := handlerChain[fieldVal]
 	if funct != nil {
 		funct(&iso)
+	} else {
+		//iso.SetField(39, rc.ISOFailed)
+		//iso.SetField(48, "Not found")
+		_ = glg.Error("Handle not found..")
+		return
 	}
 	resp, err := iso.GoMarshal()
 	if err != nil {
