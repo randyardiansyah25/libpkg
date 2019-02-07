@@ -1,11 +1,13 @@
 package obconv
 
 import (
-	"echannelgateway/model/errs"
 	"encoding/json"
+	"errors"
 	"reflect"
 	"strconv"
 )
+
+var ErrInvalidStruct = errors.New("invalid struct : only accepts structs")
 
 func JsonToMap(msg string) (map[string]interface{}, error) {
 	var msgTemplate interface{}
@@ -27,7 +29,7 @@ func SimpleStructToMapCustomTag(in interface{}, tag string) (map[string]interfac
 
 	// we only accept structs
 	if v.Kind() != reflect.Struct {
-		return nil, errs.ErrInvalidStruct
+		return nil, ErrInvalidStruct
 	}
 
 	typ := v.Type()
