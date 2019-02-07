@@ -2,7 +2,7 @@ package tcp
 
 import (
 	"fmt"
-	winnet "libpkg/net"
+	winnet "github.com/randyardiansyah25/libpkg/net"
 	"net"
 	"os"
 	"syscall"

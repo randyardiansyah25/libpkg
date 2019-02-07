@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"libpkg/net/http"
+	"github.com/randyardiansyah25/libpkg/net/http"
 )
 
 func main() {

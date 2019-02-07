@@ -2,8 +2,8 @@ package http
 
 import (
 	"fmt"
+	"github.com/randyardiansyah25/libpkg/net/http/util/urlvalues"
 	"io/ioutil"
-	"libpkg/net/http/util/urlvalues"
 	"net"
 	"net/http"
 	"net/url"

@@ -3,9 +3,9 @@ package tcpengine
 import (
 	"fmt"
 	"github.com/kpango/glg"
-	"libpkg/iso8583uparser"
-	"libpkg/net/tcp"
-	"libpkg/util/str"
+	"github.com/randyardiansyah25/libpkg/iso8583uparser"
+	"github.com/randyardiansyah25/libpkg/net/tcp"
+	"github.com/randyardiansyah25/libpkg/util/str"
 	"net"
 	"strconv"
 	"strings"

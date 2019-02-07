@@ -2,7 +2,7 @@ package tcpengine
 
 import (
 	"fmt"
-	"libpkg/iso8583uparser"
+	"github.com/randyardiansyah25/libpkg/iso8583uparser"
 	"testing"
 )
 

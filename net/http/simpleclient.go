@@ -3,9 +3,9 @@ package http
 import (
 	"bytes"
 	"fmt"
+	winnet "github.com/randyardiansyah25/libpkg/net"
 	"io"
 	"io/ioutil"
-	winnet "libpkg/net"
 	"net"
 	"net/http"
 	"net/url"

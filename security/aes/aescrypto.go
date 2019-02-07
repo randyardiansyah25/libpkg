@@ -5,7 +5,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"errors"
-	"libpkg/util/str"
+	"github.com/randyardiansyah25/libpkg/util/str"
 )
 
 func Encrypt(key, iv, text []byte) (string, error) {
