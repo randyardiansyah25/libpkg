@@ -5,7 +5,7 @@ import (
 )
 
 func TestAesCrypto_Encrypt(t *testing.T) {
-	key := []byte("us5i3channel!@@!")
+	key := []byte("secretKeyhere")
 	iv := key
 	plaintext := "123456"
 
@@ -20,7 +20,7 @@ func TestAesCrypto_Encrypt(t *testing.T) {
 }
 
 func TestAesCrypto_Decrypt(t *testing.T) {
-	key := []byte("us5i3channel!@@!")
+	key := []byte("secretKeyhere")
 	iv := key
 	ciphertext := "2397140C989F8BBB061250F419E84D34"
 
