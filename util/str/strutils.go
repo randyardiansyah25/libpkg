@@ -44,10 +44,10 @@ func PhoneNumberEscape(phoneNumber string) string {
 	if phoneNumber == "" {
 		return phoneNumber
 	} else if strings.HasPrefix(phoneNumber, "0") {
-		np := []string{"62", phoneNumber[1:len(phoneNumber)]}
+		np := []string{"62", phoneNumber[1:]}
 		return strings.Join(np, "")
 	} else if strings.HasPrefix(phoneNumber, "+") {
-		return phoneNumber[1:len(phoneNumber)]
+		return phoneNumber[1:]
 	} else {
 		return phoneNumber
 	}
