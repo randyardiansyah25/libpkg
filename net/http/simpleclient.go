@@ -180,5 +180,5 @@ func (s *SimpleClient) do(body io.Reader) *SimpleClientResponse {
 		return newResponse(http.StatusLengthRequired, string(bodyByte))
 	}
 
-	return newResponse(http.StatusOK, string(bodyByte))
+	return newResponse(resp.StatusCode, string(bodyByte))
 }
