@@ -39,6 +39,44 @@ func CenterPad(str string, size int, padChar string) string {
 	return str
 }
 
+func FormatCenter(src string, newLine bool, maxlen int) string {
+	var buff string
+	var tmpstr string
+	var str string
+	var nl string
+
+	if newLine {
+		nl = "\n"
+	}
+
+	if len(src) <= maxlen {
+		str = fmt.Sprint(CenterPad(src, maxlen, " "), nl)
+	} else {
+		buff = src
+		for len(buff) > 0 {
+			if len(buff) >= maxlen {
+				tmpstr = buff[:maxlen]
+			} else {
+				tmpstr = buff
+			}
+
+			if len(tmpstr) == maxlen {
+				str = fmt.Sprint(str, tmpstr, nl)
+			} else {
+				str = fmt.Sprint(str, RightPad(tmpstr, maxlen, " "), nl)
+			}
+
+			if len(buff) >= maxlen {
+				buff = buff[maxlen:]
+			} else {
+				buff = ""
+			}
+		}
+	}
+
+	return str
+}
+
 func ByteToHexString(src []byte) string {
 	dst := make([]byte, hex.EncodedLen(len(src)))
 	hex.Encode(dst, src)
