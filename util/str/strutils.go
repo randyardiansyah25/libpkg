@@ -22,6 +22,23 @@ func RightPad(s string, length int, pad string) string {
 	return fmt.Sprintf("%s%s", s, padding)
 }
 
+func CenterPad(str string, size int, padChar string) string {
+	strLen := len(str)
+
+	if strLen == 0 {
+		return str
+	}
+
+	pads := size - strLen
+	if pads <= 0 {
+		return str
+	}
+
+	str = LeftPad(str, strLen+pads/2, padChar)
+	str = RightPad(str, size, padChar)
+	return str
+}
+
 func ByteToHexString(src []byte) string {
 	dst := make([]byte, hex.EncodedLen(len(src)))
 	hex.Encode(dst, src)
