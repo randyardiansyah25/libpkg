@@ -9,7 +9,7 @@ import (
 
 var prepared bool
 
-func Prepare() {
+func PrepareNumberGenerator() {
 	prepared = true
 }
 
