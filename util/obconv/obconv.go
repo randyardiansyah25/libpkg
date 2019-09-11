@@ -87,3 +87,67 @@ func MapStringToStruct(in interface{}, m map[string]string, tag string) error {
 func SimpleStructToMap(in interface{}) (map[string]interface{}, error) {
 	return SimpleStructToMapCustomTag(in, "map")
 }
+
+func MapToStruct(mi interface{}, s interface{}) error {
+	tag := "map"
+	m := mi.(map[string]interface{})
+
+	v := reflect.ValueOf(s)
+
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+
+	if v.Kind() != reflect.Struct {
+		return errors.New("invalid struct")
+	}
+
+	t := v.Type()
+	for i := 0; i < t.NumField(); i++ {
+		f := t.Field(i)
+		var iv interface{}
+		iv = m[f.Tag.Get(tag)]
+		if f.Type.Kind() == reflect.String {
+			v.Field(i).SetString(iv.(string))
+		} else if f.Type.Kind() == reflect.Float64 || f.Type.Kind() == reflect.Float32 {
+			switch t := iv.(type) {
+			case float32:
+				v.Field(i).SetFloat(float64(t))
+			case float64:
+				v.Field(i).SetFloat(t)
+			case string:
+				val, _ := strconv.ParseFloat(t, 64)
+				v.Field(i).SetFloat(val)
+			case int:
+				v.Field(i).SetFloat(float64(t))
+			case int8:
+				v.Field(i).SetFloat(float64(t))
+			case int16:
+				v.Field(i).SetFloat(float64(t))
+			case int32:
+				v.Field(i).SetFloat(float64(t))
+			case int64:
+				v.Field(i).SetFloat(float64(t))
+			default:
+				v.Field(i).SetFloat(0)
+
+			}
+
+		} else if f.Type.Kind() == reflect.Int || f.Type.Kind() == reflect.Int64 || f.Type.Kind() == reflect.Int32 || f.Type.Kind() == reflect.Int16 || f.Type.Kind() == reflect.Int8 {
+			switch t := iv.(type) {
+			case float32:
+				v.Field(i).SetInt(int64(t))
+			case float64:
+				v.Field(i).SetInt(int64(t))
+			case string:
+				val, _ := strconv.ParseInt(t, 10, 64)
+				v.Field(i).SetInt(val)
+			default:
+				v.Field(i).SetInt(int64(t.(int64)))
+
+			}
+		}
+	}
+	s = v.Interface()
+	return nil
+}
