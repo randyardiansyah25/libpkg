@@ -41,24 +41,49 @@ func TestSimpleStructToMap(t *testing.T) {
 	fmt.Println("STRUCT TO MAP : ", nm)
 }
 
-func TestScanMapToStruct(t *testing.T) {
-	m := map[string]string{
-		"field_1": "field 1",
-		"field_2": "1000",
-		"field_3": "5",
-	}
-	var st = struct {
-		NamaFieldString string  `map:"field_1"`
-		NamaFieldFloat  float64 `map:"field_2"`
-		NamaFieldInt    int     `map:"field_3"`
-	}{}
+//func TestScanMapToStruct(t *testing.T) {
+//	m := map[string]string{
+//		"field_1": "field 1",
+//		"field_2": "1000",
+//		"field_3": "5",
+//	}
+//	var st = struct {
+//		NamaFieldString string  `map:"field_1"`
+//		NamaFieldFloat  float64 `map:"field_2"`
+//		NamaFieldInt    int     `map:"field_3"`
+//	}{}
+//
+//	err := ScanMapToStruct(&st, m, "map")
+//	if err != nil {
+//		fmt.Println(err.Error())
+//	}
+//
+//	fmt.Println("NamaFieldString : ", st.NamaFieldString)
+//	fmt.Println("NamaFieldFloet : ", st.NamaFieldFloat)
+//	fmt.Println("NamaFieldInt : ", st.NamaFieldInt)
+//}
 
-	err := ScanMapToStruct(&st, m, "map")
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+type Data struct {
+	FirstName string `json:"first_name" map:"first_name"`
+	LastName  string `json:"last_name" map:"last_name"`
+	Age       int    `json:"age" map:"age"`
+}
 
-	fmt.Println("NamaFieldString : ", st.NamaFieldString)
-	fmt.Println("NamaFieldFloet : ", st.NamaFieldFloat)
-	fmt.Println("NamaFieldInt : ", st.NamaFieldInt)
+type BaseResponse struct {
+	ResponseCode    string      `json:"response_code"`
+	ResponseMessage interface{} `json:"response_message"`
+}
+
+func TestMapToStruct(t *testing.T) {
+	var str = "{\"response_code\":\"01\",\"response_message\":{\"first_name\":\"Randy\",\"last_name\":\"Ardiansyah\",\"age\":23}}"
+
+	var resp = BaseResponse{}
+	var data = Data{}
+	_ = json.Unmarshal([]byte(str), &resp)
+
+	_ = MapToStruct(resp.ResponseMessage, &data)
+
+	fmt.Println(data.FirstName)
+	fmt.Println(data.LastName)
+	fmt.Println(data.Age)
 }
