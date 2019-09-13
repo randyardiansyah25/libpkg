@@ -107,6 +107,9 @@ func MapToStruct(mi interface{}, s interface{}) error {
 		f := t.Field(i)
 		var iv interface{}
 		iv = m[f.Tag.Get(tag)]
+		if iv == nil {
+			continue
+		}
 		if f.Type.Kind() == reflect.String {
 			v.Field(i).SetString(iv.(string))
 		} else if f.Type.Kind() == reflect.Float64 || f.Type.Kind() == reflect.Float32 {
