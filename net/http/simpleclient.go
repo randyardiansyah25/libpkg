@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	winnet "github.com/randyardiansyah25/libpkg/net"
+	"github.com/randyardiansyah25/libpkg/net/http/util/urlvalues"
 	"io"
 	"io/ioutil"
 	"net"
@@ -93,6 +94,9 @@ func (s *SimpleClient) GetParams() url.Values {
 }
 
 func (s *SimpleClient) DoRequest() *SimpleClientResponse {
+	if s.method == " GET" {
+		s.destUrl = urlvalues.AddParams(s.destUrl, s.params)
+	}
 	return s.do(bytes.NewBufferString(s.params.Encode()))
 }
 
