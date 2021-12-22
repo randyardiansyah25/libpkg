@@ -1,7 +1,9 @@
 package tcp
 
 import (
+	"bufio"
 	"errors"
+	"io"
 	"net"
 	"strconv"
 )
@@ -21,23 +23,36 @@ func BasicIOHandlerReader(conn net.Conn) (string, error) {
 		}
 	}
 	sHeader := string(buffHeader[:n])
-	//fmt.Println("HEADER : ", sHeader)
 	nHeader, err := strconv.Atoi(sHeader)
 	if err != nil {
 		return "", errors.New("ATOICONVERR")
 	}
-	buffBody := make([]byte, nHeader)
-	n = 0
-	for {
-		n, err = conn.Read(buffBody)
-		if err != nil {
-			return "", err
-		}
 
-		if n == nHeader {
-			break
-		}
+	buffBody := make([]byte, nHeader)
+
+	reader := bufio.NewReader(conn)
+	n, err = io.ReadFull(reader, buffBody)
+
+	if err != nil {
+		return "", err
 	}
-	//fmt.Println("Body : ", string(buffBody[:n]))
-	return string(buffBody[:n]), nil
+
+	if n != nHeader {
+		return "", errors.New("premature body")
+	}
+
+	return string(buffBody), nil
+
+	// n = 0
+	// for {
+	// 	n, err = conn.Read(buffBody)
+	// 	if err != nil {
+	// 		return "", err
+	// 	}
+
+	// 	if n == nHeader {
+	// 		break
+	// 	}
+	// }
+	// return string(buffBody[:n]), nil
 }

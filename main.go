@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/randyardiansyah25/libpkg/net/http"
 )
 
@@ -12,7 +13,11 @@ func main() {
 	//st := client.Send("test")
 	//fmt.Println(st.Code, " : ", st.Message)
 
-	p := http.PostClient{"http://localhost:8081/", "application/json", 5}
+	p := http.PostClient{
+		Url:         "http://localhost:8081/",
+		ContentType: "application/json",
+		Timeout:     5,
+	}
 	var m = map[string]interface{}{}
 	kodeBank := "0002"
 	m["kode_bank"] = kodeBank
