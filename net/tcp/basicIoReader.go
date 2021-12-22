@@ -42,7 +42,6 @@ func BasicIOHandlerReader(conn net.Conn) (string, error) {
 	}
 
 	return string(buffBody), nil
-
 	// n = 0
 	// for {
 	// 	n, err = conn.Read(buffBody)
