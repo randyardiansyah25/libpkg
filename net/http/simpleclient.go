@@ -3,8 +3,6 @@ package http
 import (
 	"bytes"
 	"fmt"
-	winnet "github.com/randyardiansyah25/libpkg/net"
-	"github.com/randyardiansyah25/libpkg/net/http/util/urlvalues"
 	"io"
 	"io/ioutil"
 	"net"
@@ -13,6 +11,9 @@ import (
 	"os"
 	"syscall"
 	"time"
+
+	winnet "github.com/randyardiansyah25/libpkg/net"
+	"github.com/randyardiansyah25/libpkg/net/http/util/urlvalues"
 )
 
 func NewSimpleClient(method string, destUrl string, timeout int64) *SimpleClient {
@@ -62,6 +63,10 @@ func (s *SimpleClient) SetHeader(key string, value string) {
 
 func (s *SimpleClient) SetContentType(value string) {
 	s.header["Content-Type"] = value
+}
+
+func (s *SimpleClient) SetContentTypeFormUrlEncoded() {
+	s.header["Content-Type"] = "x-www-form-urlencoded"
 }
 
 func (s *SimpleClient) SetAuthBasic(username string, password string) {
