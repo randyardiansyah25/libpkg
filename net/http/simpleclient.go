@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
@@ -99,7 +98,7 @@ func (s *SimpleClient) GetParams() url.Values {
 }
 
 func (s *SimpleClient) DoRequest() *SimpleClientResponse {
-	if s.method == " GET" {
+	if s.method == "GET" {
 		s.destUrl = urlvalues.AddParams(s.destUrl, s.params)
 	}
 	return s.do(bytes.NewBufferString(s.params.Encode()))
@@ -184,7 +183,7 @@ func (s *SimpleClient) do(body io.Reader) *SimpleClientResponse {
 	defer func() {
 		_ = resp.Body.Close()
 	}()
-	bodyByte, err := ioutil.ReadAll(resp.Body)
+	bodyByte, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return newResponse(http.StatusLengthRequired, string(bodyByte))
 	}
