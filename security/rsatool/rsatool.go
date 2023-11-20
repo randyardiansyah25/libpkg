@@ -111,13 +111,18 @@ func writeKeyToFile(keyBytes []byte, saveFileTo string) error {
 	return nil
 }
 
-func Encrypt(text string, publicKeyFile string) (cipherText string, err error) {
+func EncryptUsingPEM(text string, publicKeyFile string) (cipherText string, err error) {
 	buf, err := os.ReadFile(publicKeyFile)
 	if err != nil {
 		return
 	}
 
-	pemBlock, _ := pem.Decode(buf)
+	return Encrypt(text, buf)
+
+}
+
+func Encrypt(text string, publicKey []byte) (cipherText string, err error) {
+	pemBlock, _ := pem.Decode(publicKey)
 	pub, err := x509.ParsePKIXPublicKey(pemBlock.Bytes)
 	if err != nil {
 		return
@@ -132,13 +137,17 @@ func Encrypt(text string, publicKeyFile string) (cipherText string, err error) {
 	return
 }
 
-func Decrypt(cipherText string, privateKeyFile string) (text string, err error) {
+func DecryptUsingPem(cipherText string, privateKeyFile string) (text string, err error) {
 	buf, err := os.ReadFile(privateKeyFile)
 	if err != nil {
 		return "", err
 	}
 
-	pemBlock, _ := pem.Decode(buf)
+	return Decrypt(cipherText, buf)
+}
+
+func Decrypt(cipherText string, privateKey []byte) (text string, err error) {
+	pemBlock, _ := pem.Decode(privateKey)
 	priv, err := x509.ParsePKCS1PrivateKey(pemBlock.Bytes)
 	if err != nil {
 		return
