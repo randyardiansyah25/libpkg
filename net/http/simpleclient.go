@@ -65,7 +65,7 @@ func (s *SimpleClient) SetContentType(value string) {
 }
 
 func (s *SimpleClient) SetContentTypeFormUrlEncoded() {
-	s.header["Content-Type"] = "x-www-form-urlencoded"
+	s.header["Content-Type"] = "application/x-www-form-urlencoded"
 }
 
 func (s *SimpleClient) SetAuthBasic(username string, password string) {
