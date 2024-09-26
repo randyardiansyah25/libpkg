@@ -20,11 +20,6 @@ func GenerateRSAKey(saveTo string, bitSize int) (err error) {
 		return
 	}
 
-	// publicKeyBytes, err := generatePublicKey(&privateKey.PublicKey)
-	// if err != nil {
-	// 	return
-	// }
-
 	privateKeyBytes := encodePrivateKeyToPEM(privateKey)
 
 	publicKeyBytes := encodePublicKeyToPEM(&privateKey.PublicKey)
@@ -60,8 +55,11 @@ func generatePrivateKey(bitSize int) (*rsa.PrivateKey, error) {
 
 // encodePrivateKeyToPEM encodes Private Key from RSA to PEM format
 func encodePrivateKeyToPEM(privateKey *rsa.PrivateKey) []byte {
-	// Get ASN.1 DER format
-	privDER := x509.MarshalPKCS1PrivateKey(privateKey)
+
+	privDER, er := x509.MarshalPKCS8PrivateKey(privateKey)
+	if er != nil {
+		return nil
+	}
 
 	// pem.Block
 	privBlock := pem.Block{
@@ -148,7 +146,7 @@ func DecryptUsingPem(cipherText string, privateKeyFile string) (text string, err
 
 func Decrypt(cipherText string, privateKey []byte) (text string, err error) {
 	pemBlock, _ := pem.Decode(privateKey)
-	priv, err := x509.ParsePKCS1PrivateKey(pemBlock.Bytes)
+	priv, err := x509.ParsePKCS8PrivateKey(pemBlock.Bytes)
 	if err != nil {
 		return
 	}
@@ -157,7 +155,7 @@ func Decrypt(cipherText string, privateKey []byte) (text string, err error) {
 	if err != nil {
 		return
 	}
-	textBytes, err := rsa.DecryptPKCS1v15(rand.Reader, priv, chiperBytes)
+	textBytes, err := rsa.DecryptPKCS1v15(rand.Reader, priv.(*rsa.PrivateKey), chiperBytes)
 	text = string(textBytes)
 	return
 }
