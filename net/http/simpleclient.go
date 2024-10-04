@@ -35,6 +35,14 @@ type SimpleClientResponse struct {
 	code    int
 }
 
+func (e *SimpleClientResponse) Message() string {
+	return e.message
+}
+
+func (e *SimpleClientResponse) StatusCode() int {
+	return e.code
+}
+
 func newByteFromStringResponse(statusCode int, message string) *SimpleClientResponseByte {
 	msg := []byte(message)
 	return &SimpleClientResponseByte{msg, statusCode}
@@ -49,11 +57,11 @@ type SimpleClientResponseByte struct {
 	code    int
 }
 
-func (e *SimpleClientResponse) Message() string {
+func (e *SimpleClientResponseByte) Message() []byte {
 	return e.message
 }
 
-func (e *SimpleClientResponse) StatusCode() int {
+func (e *SimpleClientResponseByte) StatusCode() int {
 	return e.code
 }
 
