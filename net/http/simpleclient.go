@@ -101,14 +101,14 @@ func (s *SimpleClient) DoRequest() *SimpleClientResponse {
 	if s.method == "GET" {
 		s.destUrl = urlvalues.AddParams(s.destUrl, s.params)
 	}
-	return s.do(bytes.NewBufferString(s.params.Encode()))
+	return s.Do(bytes.NewBufferString(s.params.Encode()))
 }
 
 func (s *SimpleClient) DoRawRequest(body string) *SimpleClientResponse {
-	return s.do(bytes.NewBuffer([]byte(body)))
+	return s.Do(bytes.NewBuffer([]byte(body)))
 }
 
-func (s *SimpleClient) do(body io.Reader) *SimpleClientResponse {
+func (s *SimpleClient) Do(body io.Reader) *SimpleClientResponse {
 	req, err := http.NewRequest(s.method, s.destUrl, body)
 	if err != nil {
 		return newResponse(http.StatusBadGateway, err.Error())
