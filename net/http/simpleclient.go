@@ -30,12 +30,22 @@ type SimplePostClientAuthBasic struct {
 	password string
 }
 
-func newResponse(errCode int, errMessage string) *SimpleClientResponse {
-	return &SimpleClientResponse{errMessage, errCode}
-}
-
 type SimpleClientResponse struct {
 	message string
+	code    int
+}
+
+func newByteFromStringResponse(statusCode int, message string) *SimpleClientResponseByte {
+	msg := []byte(message)
+	return &SimpleClientResponseByte{msg, statusCode}
+}
+
+func newByteResponse(statusCode int, message []byte) *SimpleClientResponseByte {
+	return &SimpleClientResponseByte{message, statusCode}
+}
+
+type SimpleClientResponseByte struct {
+	message []byte
 	code    int
 }
 
@@ -101,17 +111,19 @@ func (s *SimpleClient) DoRequest() *SimpleClientResponse {
 	if s.method == "GET" {
 		s.destUrl = urlvalues.AddParams(s.destUrl, s.params)
 	}
-	return s.Do(bytes.NewBufferString(s.params.Encode()))
+	res := s.Do(bytes.NewBufferString(s.params.Encode()))
+	return &SimpleClientResponse{string(res.message), res.code}
 }
 
 func (s *SimpleClient) DoRawRequest(body string) *SimpleClientResponse {
-	return s.Do(bytes.NewBuffer([]byte(body)))
+	res := s.Do(bytes.NewBuffer([]byte(body)))
+	return &SimpleClientResponse{string(res.message), res.code}
 }
 
-func (s *SimpleClient) Do(body io.Reader) *SimpleClientResponse {
+func (s *SimpleClient) Do(body io.Reader) *SimpleClientResponseByte {
 	req, err := http.NewRequest(s.method, s.destUrl, body)
 	if err != nil {
-		return newResponse(http.StatusBadGateway, err.Error())
+		return newByteFromStringResponse(http.StatusBadGateway, err.Error())
 	}
 
 	if s.authBasic.username != "" {
@@ -134,59 +146,59 @@ func (s *SimpleClient) Do(body io.Reader) *SimpleClientResponse {
 		switch errType := err.(type) {
 		case *url.Error:
 			if _, ok := errType.Err.(net.Error); ok && errType.Timeout() {
-				return newResponse(http.StatusRequestTimeout, fmt.Sprint("Request timeout for ", to, " second..."))
+				return newByteFromStringResponse(http.StatusRequestTimeout, fmt.Sprint("Request timeout for ", to, " second..."))
 			} else if opErr, ok := errType.Err.(*net.OpError); ok {
 				if sysErr, ok := opErr.Err.(*os.SyscallError); ok {
 					if errno, ok := sysErr.Err.(syscall.Errno); ok {
 						if errno == syscall.ECONNABORTED || errno == winnet.WSAECONNABORTED {
-							return newResponse(http.StatusNotFound, "Connection abort")
+							return newByteFromStringResponse(http.StatusNotFound, "Connection abort")
 						} else if errno == syscall.ECONNRESET || errno == winnet.WSAECONNRESET {
-							return newResponse(http.StatusBadGateway, "Connection reset by peer")
+							return newByteFromStringResponse(http.StatusBadGateway, "Connection reset by peer")
 						} else if errno == syscall.ECONNREFUSED || errno == winnet.WSAECONNREFUSED {
-							return newResponse(http.StatusNotFound, "Connection refused")
+							return newByteFromStringResponse(http.StatusNotFound, "Connection refused")
 						} else if errno == syscall.ENETUNREACH || errno == winnet.WSAEHOSTUNREACH {
-							return newResponse(http.StatusBadGateway, "Connection unreachable")
+							return newByteFromStringResponse(http.StatusBadGateway, "Connection unreachable")
 						} else if errno == winnet.WSAEHOSTDOWN {
-							return newResponse(http.StatusBadGateway, "Host is down")
+							return newByteFromStringResponse(http.StatusBadGateway, "Host is down")
 						} else if errno == winnet.WSAESHUTDOWN {
-							return newResponse(http.StatusBadGateway, "Cannot send after socket shutdown.")
+							return newByteFromStringResponse(http.StatusBadGateway, "Cannot send after socket shutdown.")
 						} else if errno == winnet.WSAETIMEDOUT {
-							return newResponse(http.StatusBadGateway, "Connection timed out.")
+							return newByteFromStringResponse(http.StatusBadGateway, "Connection timed out.")
 						} else {
-							return newResponse(http.StatusBadGateway, err.Error())
+							return newByteFromStringResponse(http.StatusBadGateway, err.Error())
 						}
 					} else {
-						return newResponse(http.StatusBadGateway, "Closed : "+err.Error())
+						return newByteFromStringResponse(http.StatusBadGateway, "Closed : "+err.Error())
 					}
 				} else {
-					return newResponse(http.StatusBadGateway, err.Error())
+					return newByteFromStringResponse(http.StatusBadGateway, err.Error())
 				}
 			} else {
 				errs := fmt.Sprint(err.(*url.Error).Err)
 				if errs == "EOF" {
-					return newResponse(http.StatusBadRequest, "Connection reset with : "+errs)
+					return newByteFromStringResponse(http.StatusBadRequest, "Connection reset with : "+errs)
 				} else {
-					return newResponse(http.StatusBadRequest, err.Error())
+					return newByteFromStringResponse(http.StatusBadRequest, err.Error())
 				}
 			}
 
 		case net.Error:
 			if errType.Timeout() {
-				return newResponse(http.StatusRequestTimeout, fmt.Sprint("Request timeout for ", to, " second..."))
+				return newByteFromStringResponse(http.StatusRequestTimeout, fmt.Sprint("Request timeout for ", to, " second..."))
 			}
 		default:
 
 		}
 		//}
-		return newResponse(http.StatusBadGateway, "else : "+err.Error())
+		return newByteFromStringResponse(http.StatusBadGateway, "else : "+err.Error())
 	}
 	defer func() {
 		_ = resp.Body.Close()
 	}()
 	bodyByte, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return newResponse(http.StatusLengthRequired, string(bodyByte))
+		return newByteResponse(http.StatusLengthRequired, bodyByte)
 	}
 
-	return newResponse(resp.StatusCode, string(bodyByte))
+	return newByteResponse(resp.StatusCode, bodyByte)
 }
