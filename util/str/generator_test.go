@@ -6,7 +6,6 @@ import (
 )
 
 func TestGenerateNumber(t *testing.T) {
-	PrepareNumberGenerator()
 	s, err := GenerateNumber(12)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -23,7 +22,6 @@ func TestGenerateNumber(t *testing.T) {
 }
 
 func TestGenerateChars(t *testing.T) {
-	PrepareNumberGenerator()
 	s, err := GenerateChars(6)
 	if err != nil {
 		fmt.Println(err.Error())

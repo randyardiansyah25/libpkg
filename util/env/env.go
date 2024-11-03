@@ -9,79 +9,103 @@ func GetString(key string) string {
 	return os.Getenv(key)
 }
 
-func GetInt(key string) int {
+/*
+Mengambil nilai int dari environment dengan mengirimkan default value.
+Jika value pada environment tidak ditemukan, maka akan mengembalikan default value
+*/
+func GetInt(key string, def int) int {
 	value := GetString(key)
 	if value == "" {
-		return 0
+		return def
 	}
 
 	if nvalue, err := strconv.Atoi(value); err != nil {
-		return 0
+		return def
 	} else {
 		return nvalue
 	}
 }
 
-func GetInt32(key string) int32 {
+/*
+Mengambil nilai int32 dari environment dengan mengirimkan default value.
+Jika value pada environment tidak ditemukan, maka akan mengembalikan default value
+*/
+func GetInt32(key string, def int32) int32 {
 	value := GetString(key)
 	if value == "" {
-		return 0
+		return def
 	}
 
 	if nvalue, err := strconv.ParseInt(value, 10, 32); err != nil {
-		return 0
+		return def
 	} else {
 		return int32(nvalue)
 	}
 }
 
-func GetInt64(key string) int64 {
+/*
+Mengambil nilai int64 dari environment dengan mengirimkan default value.
+Jika value pada environment tidak ditemukan, maka akan mengembalikan default value
+*/
+func GetInt64(key string, def int64) int64 {
 	value := GetString(key)
 	if value == "" {
-		return 0
+		return def
 	}
 
 	if nvalue, err := strconv.ParseInt(value, 10, 64); err != nil {
-		return 0
+		return def
 	} else {
 		return nvalue
 	}
 }
 
-func GetFloat32(key string) float32 {
+/*
+Mengambil nilai float32 dari environment dengan mengirimkan default value.
+Jika value pada environment tidak ditemukan, maka akan mengembalikan default value
+*/
+func GetFloat32(key string, def float32) float32 {
 	value := GetString(key)
 	if value == "" {
-		return 0
+		return def
 	}
 
 	if nvalue, err := strconv.ParseFloat(value, 32); err != nil {
-		return 0
+		return def
 	} else {
 		return float32(nvalue)
 	}
 }
 
-func GetFloat64(key string) float64 {
+/*
+Mengambil nilai float64 dari environment dengan mengirimkan default value.
+Jika value pada environment tidak ditemukan, maka akan mengembalikan default value
+*/
+func GetFloat64(key string, def float64) float64 {
 	value := GetString(key)
 	if value == "" {
-		return 0
+		return def
 	}
 
 	if nvalue, err := strconv.ParseFloat(value, 64); err != nil {
-		return 0
+		return def
 	} else {
 		return nvalue
 	}
 }
 
-func GetBool(key string) bool {
+/*
+Mengambil nilai bool dari environment dengan mengirimkan default value.
+Jika value pada environment tidak ditemukan, maka akan mengembalikan default value
+*/
+func GetBool(key string, def bool) bool {
 	value := GetString(key)
 	if value == "" {
-		return false
+		return def
 	}
 
 	if bvalue, err := strconv.ParseBool(value); err != nil {
-		return false
+		return def
 	} else {
 		return bvalue
 	}

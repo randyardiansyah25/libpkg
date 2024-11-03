@@ -26,16 +26,14 @@ func TestRightPadPad(t *testing.T) {
 }
 
 func TestCenterPad(t *testing.T) {
-	var str string
-	str = "hello world!"
+	str := "hello world!"
 
 	t.Log("String       :", str)
 	t.Log("Center :", CenterPad(str, 32, "*"))
 }
 
 func TestFormatCenter(t *testing.T) {
-	var str string
-	str = "untuk check balance, dikarenakan di app Dainan ada fitur pembiayaan , atau tabungan saldo kurang , sehingga meminta satu informasi saldo_akhir dari saldo tasakur-nya."
+	str := "untuk check balance, dikarenakan di app Dainan ada fitur pembiayaan , atau tabungan saldo kurang , sehingga meminta satu informasi saldo_akhir dari saldo tasakur-nya."
 
 	t.Log("String       :", str)
 	fmt.Print("Center :", "\n", FormatCenter(str, true, 32))
