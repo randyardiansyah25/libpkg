@@ -6,33 +6,23 @@ import (
 )
 
 func TestGenerateNumber(t *testing.T) {
-	s, err := GenerateNumber(12)
-	if err != nil {
-		fmt.Println(err.Error())
-	} else {
-		fmt.Println("first: ", s)
-	}
+	s := GenerateNumber(12)
 
-	s, err = GenerateNumber(12)
-	if err != nil {
-		fmt.Println(err.Error())
-	} else {
-		fmt.Println("second : ", s)
-	}
+	fmt.Println("first: ", s)
+
+	s = GenerateNumber(12)
+
+	fmt.Println("second : ", s)
+
 }
 
 func TestGenerateChars(t *testing.T) {
-	s, err := GenerateChars(6)
-	if err != nil {
-		fmt.Println(err.Error())
-	} else {
-		fmt.Println("first: ", s)
-	}
+	s := GenerateChars(6)
 
-	s, err = GenerateNumber(6)
-	if err != nil {
-		fmt.Println(err.Error())
-	} else {
-		fmt.Println("second : ", s)
-	}
+	fmt.Println("first: ", s)
+
+	s = GenerateNumber(6)
+
+	fmt.Println("second : ", s)
+
 }
