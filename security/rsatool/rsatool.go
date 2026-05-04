@@ -3,9 +3,11 @@ package rsatool
 import (
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
+	"fmt"
 	"os"
 
 	"golang.org/x/crypto/ssh"
@@ -119,16 +121,53 @@ func EncryptUsingPEM(text string, publicKeyFile string) (cipherText string, err 
 
 }
 
+// ! Deprecated: gunakan Encrypt dengan OAEP
+// func Encrypt(text string, publicKey []byte) (cipherText string, err error) {
+// 	pemBlock, _ := pem.Decode(publicKey)
+// 	pub, err := x509.ParsePKIXPublicKey(pemBlock.Bytes)
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	cipherBytes, err := rsa.EncryptPKCS1v15(rand.Reader, pub.(*rsa.PublicKey), []byte(text))
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	cipherText = base64.StdEncoding.EncodeToString(cipherBytes)
+// 	return
+// }
+
 func Encrypt(text string, publicKey []byte) (cipherText string, err error) {
 	pemBlock, _ := pem.Decode(publicKey)
-	pub, err := x509.ParsePKIXPublicKey(pemBlock.Bytes)
-	if err != nil {
-		return
+	if pemBlock == nil {
+		return "", fmt.Errorf("failed to decode PEM block")
 	}
 
-	cipherBytes, err := rsa.EncryptPKCS1v15(rand.Reader, pub.(*rsa.PublicKey), []byte(text))
+	pubInterface, err := x509.ParsePKIXPublicKey(pemBlock.Bytes)
 	if err != nil {
-		return
+		return "", err
+	}
+
+	pub, ok := pubInterface.(*rsa.PublicKey)
+	if !ok {
+		return "", fmt.Errorf("not RSA public key")
+	}
+
+	// gunakan SHA-256
+	hash := sha256.New()
+
+	label := []byte("")
+	cipherBytes, err := rsa.EncryptOAEP(
+		hash,
+		rand.Reader,
+		pub,
+		[]byte(text),
+		label, // label optional, biasanya nil
+	)
+
+	if err != nil {
+		return "", err
 	}
 
 	cipherText = base64.StdEncoding.EncodeToString(cipherBytes)
@@ -144,18 +183,56 @@ func DecryptUsingPem(cipherText string, privateKeyFile string) (text string, err
 	return Decrypt(cipherText, buf)
 }
 
-func Decrypt(cipherText string, privateKey []byte) (text string, err error) {
-	pemBlock, _ := pem.Decode(privateKey)
-	priv, err := x509.ParsePKCS8PrivateKey(pemBlock.Bytes)
+// ! Deprecated: gunakan Decrypt dengan OAEP
+// func Decrypt(cipherText string, privateKey []byte) (text string, err error) {
+// 	pemBlock, _ := pem.Decode(privateKey)
+// 	priv, err := x509.ParsePKCS8PrivateKey(pemBlock.Bytes)
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	chiperBytes, err := base64.StdEncoding.DecodeString(cipherText)
+// 	if err != nil {
+// 		return
+// 	}
+// 	textBytes, err := rsa.DecryptPKCS1v15(rand.Reader, priv.(*rsa.PrivateKey), chiperBytes)
+// 	text = string(textBytes)
+// 	return
+// }
+
+func Decrypt(cipherText string, privateKey []byte) (string, error) {
+	cipherBytes, err := base64.StdEncoding.DecodeString(cipherText)
 	if err != nil {
-		return
+		return "", err
 	}
 
-	chiperBytes, err := base64.StdEncoding.DecodeString(cipherText)
-	if err != nil {
-		return
+	pemBlock, _ := pem.Decode(privateKey)
+	if pemBlock == nil {
+		return "", fmt.Errorf("failed to decode PEM block")
 	}
-	textBytes, err := rsa.DecryptPKCS1v15(rand.Reader, priv.(*rsa.PrivateKey), chiperBytes)
-	text = string(textBytes)
-	return
+
+	key, err := x509.ParsePKCS8PrivateKey(pemBlock.Bytes)
+	if err != nil {
+		return "", err
+	}
+
+	priv, ok := key.(*rsa.PrivateKey)
+	if !ok {
+		return "", fmt.Errorf("not RSA key")
+	}
+
+	hash := sha256.New()
+	label := []byte("")
+	plainBytes, err := rsa.DecryptOAEP(
+		hash,
+		rand.Reader,
+		priv,
+		cipherBytes,
+		label,
+	)
+	if err != nil {
+		return "", err
+	}
+
+	return string(plainBytes), nil
 }
