@@ -14,8 +14,8 @@ import (
 )
 
 func GenerateRSAKey(saveTo string, bitSize int) (err error) {
-	savePrivateFileTo := saveTo
-	savePublicFileTo := saveTo + ".pub"
+	savePrivateFileTo := saveTo + "_private_key.pem"
+	savePublicFileTo := saveTo + "_public_key.pem"
 
 	privateKey, err := generatePrivateKey(bitSize)
 	if err != nil {
@@ -174,7 +174,7 @@ func Encrypt(text string, publicKey []byte) (cipherText string, err error) {
 	return
 }
 
-func DecryptUsingPem(cipherText string, privateKeyFile string) (text string, err error) {
+func DecryptUsingPEM(cipherText string, privateKeyFile string) (text string, err error) {
 	buf, err := os.ReadFile(privateKeyFile)
 	if err != nil {
 		return "", err
